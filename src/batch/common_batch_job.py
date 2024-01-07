@@ -7,15 +7,10 @@ from transform_methods import *
 class CommonBatchJob(BaseBatchJob):
     def __init__(self, spark_client, resolved_args: dict):
         super().__init__(spark_client, resolved_args)
-        self.analysis_number = self.resolved_args.get("analysis_number", None)
+        self.analysis_number = self.resolved_args.get("analysis_number", None).lower()
         self.analysis_config = self.resolved_args.get("analysis_config", None)
-        self.input_path = self.resolved_args.get("input_path", None)
-        self.output_path = self.resolved_args.get("output_path", None)
-        if not self.input_path:
-            raise Exception("Input path is not provided.")
-        if not self.output_path:
-            raise Exception("output path is not provided.")
-        print(self.input_path)
+        self.input_path = self.resolved_args.get("input_path", "input_data")
+        self.output_path = self.resolved_args.get("output_path", "output")
 
     def execute_job(self):
         self.extract()
@@ -29,15 +24,10 @@ class CommonBatchJob(BaseBatchJob):
             for file in source_data:
                 print(f"Extraction process started for {file}")
                 df = self.spark_client.read_csv_file(self.input_path + '/' + f"{file}.csv")
-                source_config = get_source_config(file)
-                print(f"Source config for file: {file} \n {source_config}")
-                if source_config:
-                    # I have seen that few tables have some duplicate records, to remove that it is added
-                    if source_config.dedupes:
-                        if source_config.pk_cols:
-                            df = df.dropDuplicates(*source_config.pk_cols)
-                        else:
-                            df = df.dropDuplicates()
+
+                # I have seen that few tables have some duplicate records, to remove that it is added
+                if file in [InputData.Units.value]:
+                    df = df.dropDuplicates(["CRASH_ID", "UNIT_NBR"])
 
                 df.createOrReplaceTempView(file)
         else:
@@ -48,6 +38,12 @@ class CommonBatchJob(BaseBatchJob):
         print("Transformation [STARTED]")
         if self.analysis_number == Analysis.Analysis_1.value:
             result = transformation_for_analysis_1(self.spark_client, self.analysis_config)
+        elif self.analysis_number == Analysis.Analysis_2.value:
+            result = transformation_for_analysis_2(self.spark_client, self.analysis_config)
+        elif self.analysis_number == Analysis.Analysis_3.value:
+            result = transformation_for_analysis_3(self.spark_client, self.analysis_config)
+        else:
+            print("Invalid Analysis Number!!!")
 
         if type(result) == int:
             self.result_str = f"Required final count for this analysis is: {result}"
@@ -59,7 +55,7 @@ class CommonBatchJob(BaseBatchJob):
 
         if self.result_str:
             print(f"Loading the result as text file into the given output path: {self.output_path}")
-            text_file = open(f"{self.output_path}/{self.analysis_number}/{self.analysis_number}.txt", "w")
+            text_file = open(f"{self.output_path}/{self.analysis_number}.txt", "w")
             n = text_file.write(self.result_str)
             text_file.close()
             print(f"Loading the result as text file into the given output path: {self.output_path} is [COMPLETED]")

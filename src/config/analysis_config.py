@@ -17,6 +17,12 @@ class AnalysisConfig:
 analysis_config = {
     Analysis.Analysis_1.value: {
         'source_data': [InputData.Primary_Person.value]
+    },
+    Analysis.Analysis_2.value: {
+        'source_data': [InputData.Units.value]
+    },
+    Analysis.Analysis_3.value: {
+        'source_data': [InputData.Units.value, InputData.Primary_Person.value]
     }
 }
 

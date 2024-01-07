@@ -9,6 +9,9 @@ resolved_args = {}
 class DriverJob:
     def __init__(self, resolved_args:dict):
         self.analysis_number = resolved_args.get("analysis_number", None)
+        if not self.analysis_number:
+            print("Analysis number must be provided as parameter!!!")
+            raise Exception("Analysis number must be provided as parameter!!!")
         self.resolved_args = resolved_args
 
     def start_job(self):
@@ -47,7 +50,4 @@ def get_args():
 
 if __name__ == '__main__':
     print("hello World")
-    # df = SparkClient().get_spark().read.format('csv').option("header", "true") \
-    #     .option("inferSchema", "true").load("/Users/jikusandilya/Desktop/Python/bcg-case-study/input_data/Primary_Person_use.csv")
-    # df.show()
     DriverJob(get_args()).start_job()

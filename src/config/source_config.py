@@ -13,6 +13,10 @@ class SourceConfig:
 source_config = {
     InputData.Primary_Person.value: {
         'pk_cols': ["CRASH_ID", "UNIT_NBR", "PRSN_NBR"]
+    },
+    InputData.Units.value: {
+        'pk_cols': ["CRASH_ID", "UNIT_NBR"],
+        'dedupes': True
     }
 }
 
