@@ -42,6 +42,14 @@ class CommonBatchJob(BaseBatchJob):
             result = transformation_for_analysis_2(self.spark_client, self.analysis_config)
         elif self.analysis_number == Analysis.Analysis_3.value:
             result = transformation_for_analysis_3(self.spark_client, self.analysis_config)
+        elif self.analysis_number == Analysis.Analysis_4.value:
+            result = transformation_for_analysis_4(self.spark_client, self.analysis_config)
+        elif self.analysis_number == Analysis.Analysis_5.value:
+            result = transformation_for_analysis_5(self.spark_client, self.analysis_config)
+        elif self.analysis_number == Analysis.Analysis_6.value:
+            result = transformation_for_analysis_6(self.spark_client, self.analysis_config)
+        elif self.analysis_number == Analysis.Analysis_7.value:
+            result = transformation_for_analysis_7(self.spark_client, self.analysis_config)
         else:
             print("Invalid Analysis Number!!!")
 

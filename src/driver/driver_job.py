@@ -9,9 +9,6 @@ resolved_args = {}
 class DriverJob:
     def __init__(self, resolved_args:dict):
         self.analysis_number = resolved_args.get("analysis_number", None)
-        if not self.analysis_number:
-            print("Analysis number must be provided as parameter!!!")
-            raise Exception("Analysis number must be provided as parameter!!!")
         self.resolved_args = resolved_args
 
     def start_job(self):
@@ -49,5 +46,18 @@ def get_args():
 
 
 if __name__ == '__main__':
-    print("hello World")
-    DriverJob(get_args()).start_job()
+    resolved_args = get_args()
+    analysis_number = resolved_args.get("analysis_number", None)
+    if analysis_number and analysis_number.lower().startswith('analysis'):
+        DriverJob(resolved_args).start_job()
+
+    # This process is designed to run one analysis at as time using paramter,
+    # this code this just added to give the flexibility to run all the analysis at the same time
+    elif analysis_number and analysis_number.lower() == 'all':
+        analysis_list = ['analysis_1', 'analysis_2', 'analysis_3', 'analysis_4']
+        for a in analysis_list:
+            resolved_args['analysis_number'] = a
+            DriverJob(resolved_args).start_job()
+    else:
+        print("Invalid Analysis Number!!")
+        raise Exception("Invalid Analysis Number!!")

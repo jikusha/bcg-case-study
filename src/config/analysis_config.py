@@ -23,6 +23,18 @@ analysis_config = {
     },
     Analysis.Analysis_3.value: {
         'source_data': [InputData.Units.value, InputData.Primary_Person.value]
+    },
+    Analysis.Analysis_4.value: {
+        'source_data': [InputData.Units.value, InputData.Primary_Person.value]
+    },
+    Analysis.Analysis_5.value: {
+        'source_data': [InputData.Units.value, InputData.Primary_Person.value]
+    },
+    Analysis.Analysis_6.value: {
+        'source_data': [InputData.Units.value, InputData.Primary_Person.value]
+    },
+    Analysis.Analysis_7.value: {
+        'source_data': [InputData.Units.value, InputData.Primary_Person.value]
     }
 }
 

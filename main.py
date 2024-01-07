@@ -69,9 +69,9 @@ df_units = df_units.dropDuplicates(["CRASH_ID", "UNIT_NBR"])
 
 
 #3
-df_pp_filtered = df_pp.dropDuplicates(["CRASH_ID", "UNIT_NBR", "PRSN_NBR"]).filter("PRSN_AIRBAG_ID == 'NOT DEPLOYED' and PRSN_INJRY_SEV_ID == 'KILLED' and PRSN_TYPE_ID == 'DRIVER'")
-print(df_pp_filtered.count())
-df_units = df_units.dropDuplicates(["CRASH_ID", "UNIT_NBR"])
+# df_pp_filtered = df_pp.dropDuplicates(["CRASH_ID", "UNIT_NBR", "PRSN_NBR"]).filter("PRSN_AIRBAG_ID == 'NOT DEPLOYED' and PRSN_INJRY_SEV_ID == 'KILLED' and PRSN_TYPE_ID == 'DRIVER'")
+# print(df_pp_filtered.count())
+# df_units = df_units.dropDuplicates(["CRASH_ID", "UNIT_NBR"])
 
 # df_pp.select("PRSN_AIRBAG_ID").distinct().show()
 # df_pp.select("PRSN_INJRY_SEV_ID").distinct().show()
@@ -80,21 +80,22 @@ df_units = df_units.dropDuplicates(["CRASH_ID", "UNIT_NBR"])
 # df_pp.orderBy("CRASH_ID", "UNIT_NBR", "PRSN_NBR").show()
 # df_units.orderBy("CRASH_ID", "UNIT_NBR").show()
 
-df_joined = df_units.join(df_pp_filtered, ["CRASH_ID", "UNIT_NBR"], "inner").select(df_units.CRASH_ID, df_units.UNIT_NBR, df_pp_filtered.PRSN_NBR, "PRSN_TYPE_ID", "VEH_MAKE_ID", "PRSN_INJRY_SEV_ID", "PRSN_AIRBAG_ID")
-df_joined_group = df_joined.groupBy("VEH_MAKE_ID").count().orderBy("count", ascending = False).limit(5)
-
-df_joined_group.show()
+# df_joined = df_units.join(df_pp_filtered, ["CRASH_ID", "UNIT_NBR"], "inner").select(df_units.CRASH_ID, df_units.UNIT_NBR, df_pp_filtered.PRSN_NBR, "PRSN_TYPE_ID", "VEH_MAKE_ID", "PRSN_INJRY_SEV_ID", "PRSN_AIRBAG_ID")
+# df_joined_group = df_joined.groupBy("VEH_MAKE_ID").count().orderBy("count", ascending = False).limit(5)
+#
+# df_joined_group.show()
 
 #4
 # df_units_filtered = df_units.filter("VEH_HNR_FL == 'Y'")
 # df_pp_filtered = df_pp.filter("(DRVR_LIC_TYPE_ID == 'COMMERCIAL DRIVER LIC.' or DRVR_LIC_TYPE_ID == 'DRIVER LICENSE') and (PRSN_TYPE_ID == 'DRIVER' or PRSN_TYPE_ID == 'DRIVER OF MOTORCYCLE TYPE VEHICLE')")
-# df_pp_filtered.filter("PRSN_TYPE_ID == 'UNKNOWN'").show()
+# # df_pp_filtered.filter("PRSN_TYPE_ID == 'UNKNOWN'").show()
 # print(df_units_filtered.count())
-# df_units_filtered.select("UNIT_DESC_ID").distinct().show()
-#
+# print(df_pp_filtered.count())
+# # df_units_filtered.select("UNIT_DESC_ID").distinct().show()
+# #
 # df_joined = df_units_filtered.join(df_pp_filtered, ["CRASH_ID", "UNIT_NBR"], "inner")
-# df_joined.select("PRSN_TYPE_ID").distinct().show(truncate=False)
-# df_joined.select("DRVR_LIC_TYPE_ID").distinct().show(truncate=False)
+# # df_joined.select("PRSN_TYPE_ID").distinct().show(truncate=False)
+# # df_joined.select("DRVR_LIC_TYPE_ID").distinct().show(truncate=False)
 # print(df_joined.count())
 
 
@@ -108,7 +109,7 @@ df_joined_group.show()
 # df_pp_filtered_5 = df_pp.filter("PRSN_GNDR_ID = 'FEMALE'").select("crash_id").distinct()
 # df_units_filtered_5 = df_units.select("crash_id", "VEH_LIC_STATE_ID")
 # df_joined_5 = df_units_filtered_5.join(df_pp_filtered_5, df_units_filtered_5['crash_id'] == df_pp_filtered_5["crash_id"], "leftanti").select(df_units_filtered_5["crash_id"], "VEH_LIC_STATE_ID")
-# df_res = df_joined_5.distinct().groupby("VEH_LIC_STATE_ID").count().orderBy("count", ascending = False).limit(1)
+# df_res = df_joined_5.groupby("VEH_LIC_STATE_ID").count().orderBy("count", ascending = False).limit(1)
 # df_res.show()
 
 
@@ -116,24 +117,24 @@ df_joined_group.show()
 #6
 
 # df_pp_filtered_6 = df_pp.filter("PRSN_INJRY_SEV_ID != 'NOT INJURED' and PRSN_INJRY_SEV_ID != 'NA' and PRSN_INJRY_SEV_ID != 'UNKNOWN'")
-#
+# #
 # df_joined = df_units.join(df_pp_filtered_6, ["CRASH_ID", "UNIT_NBR"], "inner")
-#
+# #
 # df_res = df_joined.groupby("VEH_MAKE_ID").count().orderBy("count", ascending = False)
-# df_res.show()
+# # df_res.show()
 # windowSpec  = Window.orderBy(col("count").desc())
 # df_res_final = df_res.withColumn("rn", row_number().over(windowSpec)).where("rn>=3 and rn<=5").drop("rn")
 # df_res_final.show()
 
 #7
 
-# df_joined_7 = df_units.join(df_pp, ["CRASH_ID", "UNIT_NBR"], "inner")
+df_joined_7 = df_units.join(df_pp, ["CRASH_ID", "UNIT_NBR"], "inner")
 # print(df_joined_7.count())
-# df_joined_7 = df_joined_7.groupby("VEH_BODY_STYL_ID", "PRSN_ETHNICITY_ID").count().orderBy("VEH_BODY_STYL_ID", "PRSN_ETHNICITY_ID")
+df_joined_7 = df_joined_7.groupby("VEH_BODY_STYL_ID", "PRSN_ETHNICITY_ID").count().orderBy("VEH_BODY_STYL_ID", "PRSN_ETHNICITY_ID")
 # df_joined_7.show(100)
-# windowSpec  = Window.partitionBy("VEH_BODY_STYL_ID").orderBy(col("count").desc())
-# df_final_7 = df_joined_7.withColumn("rn", row_number().over(windowSpec)).where("rn = 1").drop("rn")
-# df_final_7.show()
+windowSpec  = Window.partitionBy("VEH_BODY_STYL_ID").orderBy(col("count").desc())
+df_final_7 = df_joined_7.withColumn("rn", row_number().over(windowSpec)).where("rn = 1").drop("rn")
+df_final_7.show()
 
 
 #8
