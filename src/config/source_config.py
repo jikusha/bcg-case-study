@@ -25,9 +25,6 @@ def get_source_config(source_file):
         final_source_config = SourceConfig(**config)
         print(f"Config for source_file: {source_file}: \n {final_source_config}")
         return final_source_config
-    except KeyError as ex:
-        print(f"Unable to load config for analysis: {source_file}, as source_file_name is not correct")
-        raise Exception(f"Unable to load config for analysis: {source_file}, as source_file_name is not correct")
     except Exception as ex:
-        print(f"Unable to load config for analysis: {source_file}, due to {ex}")
-        raise ex
+        print(f"Unable to load config for source: {source_file}, due to {ex}")
+        return {}

@@ -47,4 +47,7 @@ def get_args():
 
 if __name__ == '__main__':
     print("hello World")
+    # df = SparkClient().get_spark().read.format('csv').option("header", "true") \
+    #     .option("inferSchema", "true").load("/Users/jikusandilya/Desktop/Python/bcg-case-study/input_data/Primary_Person_use.csv")
+    # df.show()
     DriverJob(get_args()).start_job()
