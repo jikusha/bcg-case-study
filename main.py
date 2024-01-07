@@ -128,13 +128,13 @@ df_units = df_units.dropDuplicates(["CRASH_ID", "UNIT_NBR"])
 
 #7
 
-df_joined_7 = df_units.join(df_pp, ["CRASH_ID", "UNIT_NBR"], "inner")
-# print(df_joined_7.count())
-df_joined_7 = df_joined_7.groupby("VEH_BODY_STYL_ID", "PRSN_ETHNICITY_ID").count().orderBy("VEH_BODY_STYL_ID", "PRSN_ETHNICITY_ID")
-# df_joined_7.show(100)
-windowSpec  = Window.partitionBy("VEH_BODY_STYL_ID").orderBy(col("count").desc())
-df_final_7 = df_joined_7.withColumn("rn", row_number().over(windowSpec)).where("rn = 1").drop("rn")
-df_final_7.show()
+# df_joined_7 = df_units.join(df_pp, ["CRASH_ID", "UNIT_NBR"], "inner")
+# # print(df_joined_7.count())
+# df_joined_7 = df_joined_7.groupby("VEH_BODY_STYL_ID", "PRSN_ETHNICITY_ID").count().orderBy("VEH_BODY_STYL_ID", "PRSN_ETHNICITY_ID")
+# # df_joined_7.show(100)
+# windowSpec  = Window.partitionBy("VEH_BODY_STYL_ID").orderBy(col("count").desc())
+# df_final_7 = df_joined_7.withColumn("rn", row_number().over(windowSpec)).where("rn = 1").drop("rn")
+# df_final_7.show()
 
 
 #8
@@ -143,13 +143,13 @@ df_final_7.show()
 # df_units.show()
 # # df_units.select("CONTRIB_FACTR_1_ID").distinct().show(100, truncate=False)
 # # df_units.select("CONTRIB_FACTR_2_ID").distinct().show(100, truncate=False)
-# df_units_filtered_8 = df_units.filter("UNIT_DESC_ID == 'MOTOR VEHICLE'").filter("CONTRIB_FACTR_1_ID == 'HAD BEEN DRINKING' or CONTRIB_FACTR_2_ID = 'HAD BEEN DRINKING'")
+df_units_filtered_8 = df_units.filter("CONTRIB_FACTR_1_ID == 'HAD BEEN DRINKING' or CONTRIB_FACTR_2_ID = 'HAD BEEN DRINKING' or CONTRIB_FACTR_P1_ID = 'HAD BEEN DRINKING'")
 # print(df_pp.count())
 # print(df_units_filtered_8.count())
-# df_joined_8 = df_units_filtered_8.join(df_pp, ["CRASH_ID", "UNIT_NBR"], "inner")
-# print(df_joined_8.count())
-# df_final_8 = df_joined_8.groupby("DRVR_ZIP").count().orderBy("count", ascending = False).filter("DRVR_ZIP is not null").limit(5)
-# df_final_8.show()
+df_joined_8 = df_units_filtered_8.join(df_pp, ["CRASH_ID", "UNIT_NBR"], "inner")
+print(df_joined_8.count())
+df_final_8 = df_joined_8.groupby("DRVR_ZIP").count().orderBy("count", ascending = False).filter("DRVR_ZIP is not null").limit(5)
+df_final_8.show()
 
 #9
 

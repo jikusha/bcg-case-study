@@ -35,6 +35,9 @@ analysis_config = {
     },
     Analysis.Analysis_7.value: {
         'source_data': [InputData.Units.value, InputData.Primary_Person.value]
+    },
+    Analysis.Analysis_8.value: {
+        'source_data': [InputData.Units.value, InputData.Primary_Person.value]
     }
 }
 

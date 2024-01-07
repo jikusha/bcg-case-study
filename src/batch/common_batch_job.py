@@ -50,6 +50,8 @@ class CommonBatchJob(BaseBatchJob):
             result = transformation_for_analysis_6(self.spark_client, self.analysis_config)
         elif self.analysis_number == Analysis.Analysis_7.value:
             result = transformation_for_analysis_7(self.spark_client, self.analysis_config)
+        elif self.analysis_number == Analysis.Analysis_8.value:
+            result = transformation_for_analysis_8(self.spark_client, self.analysis_config)
         else:
             print("Invalid Analysis Number!!!")
 

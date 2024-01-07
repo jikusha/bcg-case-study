@@ -85,3 +85,15 @@ def transformation_for_analysis_7(spark_client, analysis_config):
     window_spec = Window.partitionBy("VEH_BODY_STYL_ID").orderBy(col("count").desc())
     df_final = df_grouped.withColumn("rn", row_number().over(window_spec)).where("rn = 1").drop("rn")
     return df_final
+
+def transformation_for_analysis_8(spark_client, analysis_config):
+    print("Transformation Started for Analysis 8 =>")
+
+    df_units = spark_client.read_spark_table(InputData.Units.value)
+    df_units_filtered = df_units.\
+                        filter("CONTRIB_FACTR_1_ID == 'HAD BEEN DRINKING' or CONTRIB_FACTR_2_ID = 'HAD BEEN DRINKING' or CONTRIB_FACTR_P1_ID = 'HAD BEEN DRINKING'")
+    df_primary_person = spark_client.read_spark_table(InputData.Primary_Person.value)
+    df_primary_person_filtered = df_primary_person.filter(df_primary_person.PRSN_TYPE_ID.like('DRIVER%'))
+    df_joined = df_units_filtered.join(df_primary_person_filtered, ["CRASH_ID", "UNIT_NBR"], "inner")
+    df_final = df_joined.filter(df_joined.DRVR_ZIP.isNotNull()).groupby("DRVR_ZIP").count().orderBy("count", ascending=False).limit(5)
+    return df_final
