@@ -5,7 +5,7 @@ Steps to execute the application to get the results of the given 10 analysis:
 
 2. There are two approaches, we can run the application:
 
-    a. All the 10 analysis at once and save the results into the given output path. To execute this following
+    1) All the 10 analysis at once and save the results into the given output path. To execute this following
         spark-submit needs to be executed.
         Execute the below command in the main folder (i.e. bcg-case-study)
 
@@ -24,7 +24,7 @@ output_path=/Users/jikusandilya/Desktop/Python/bcg-case-study/output
     Need to pass command line argument, the analysis_number as all and input_path and output_path can be specified if you want a custom location.
     By default, it will use the path of input_data path and output path present in the project directory.
 
-   b. One analysis at one time and save the result.
+   2) One analysis at one time and save the result.
       For that, replace analysis_number as analysis_1 or analysis_2 or .... or analysis_10.
 
    Like this:
