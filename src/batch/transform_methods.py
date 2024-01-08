@@ -44,7 +44,7 @@ def transformation_for_analysis_4(spark_client, analysis_config):
     df_units_filtered = df_units.filter(df_units.VEH_HNR_FL == 'Y')
     df_pp_filtered = df_primary_person.filter(((df_primary_person.DRVR_LIC_TYPE_ID == 'COMMERCIAL DRIVER LIC.') | \
                                               (df_primary_person.DRVR_LIC_TYPE_ID == 'DRIVER LICENSE')) \
-                                              & (df_primary_person.PRSN_TYPE_ID.like('DRIVER%')))
+                                              & (df_primary_person.PRSN_TYPE_ID.ilike('DRIVER%')))
     df_final = df_units_filtered.join(df_pp_filtered, ["CRASH_ID", "UNIT_NBR"], "inner")
     return df_final.count()
 
@@ -93,7 +93,7 @@ def transformation_for_analysis_8(spark_client, analysis_config):
     df_units_filtered = df_units.\
                         filter("CONTRIB_FACTR_1_ID == 'HAD BEEN DRINKING' or CONTRIB_FACTR_2_ID = 'HAD BEEN DRINKING' or CONTRIB_FACTR_P1_ID = 'HAD BEEN DRINKING'")
     df_primary_person = spark_client.read_spark_table(InputData.Primary_Person.value)
-    df_primary_person_filtered = df_primary_person.filter(df_primary_person.PRSN_TYPE_ID.like('DRIVER%'))
+    df_primary_person_filtered = df_primary_person.filter(df_primary_person.PRSN_TYPE_ID.ilike('DRIVER%'))
     df_joined = df_units_filtered.join(df_primary_person_filtered, ["CRASH_ID", "UNIT_NBR"], "inner")
     df_final = df_joined.filter(df_joined.DRVR_ZIP.isNotNull()).groupby("DRVR_ZIP").count().orderBy("count", ascending=False).limit(5)
     return df_final
@@ -105,12 +105,12 @@ def transformation_for_analysis_9(spark_client, analysis_config):
     df_damages = spark_client.read_spark_table(InputData.Damages.value)
 
     df_units_filtered_1 = df_units.\
-                        filter(df_units.VEH_DMAG_SCL_1_ID.like('DAMAGED%')).\
+                        filter(df_units.VEH_DMAG_SCL_1_ID.ilike('DAMAGED%')).\
                         withColumn("damage_1", split("VEH_DMAG_SCL_1_ID", ' ').getItem(1)).\
                         filter("damage_1 > 4").select("crash_id", "unit_nbr", "fin_resp_type_id")
 
     df_units_filtered_2 = df_units. \
-        filter(df_units.VEH_DMAG_SCL_2_ID.like('DAMAGED%')). \
+        filter(df_units.VEH_DMAG_SCL_2_ID.ilike('DAMAGED%')). \
         withColumn("damage_2", split("VEH_DMAG_SCL_2_ID", ' ').getItem(1)). \
         filter("damage_2 > 4").select("crash_id", "unit_nbr", "fin_resp_type_id")
 
@@ -123,3 +123,41 @@ def transformation_for_analysis_9(spark_client, analysis_config):
 
     df_final = df_units_crash_id_distinct.join(df_damages_crash_id_distinct, ["crash_id"], "leftanti")
     return df_final.count()
+
+def transformation_for_analysis_10(spark_client, analysis_config):
+    print("Transformation Started for Analysis 10 =>")
+
+    df_units = spark_client.read_spark_table(InputData.Units.value)
+    df_units.cache() # as this df is used multiple times
+    df_charges = spark_client.read_spark_table(InputData.Charges.value)
+    df_primary_person = spark_client.read_spark_table(InputData.Primary_Person.value)
+
+    top_10_color = df_units.filter(df_units.VEH_COLOR_ID != 'NA').\
+                   groupBy('VEH_COLOR_ID').count().\
+                   orderBy("count", ascending = False).limit(10).select("VEH_COLOR_ID")
+
+    top_25_state = df_units.filter(df_units.VEH_LIC_STATE_ID != 'NA').\
+                    groupBy("VEH_LIC_STATE_ID").count().\
+                    orderBy("count", ascending = False).limit(25).select("VEH_LIC_STATE_ID")
+
+    df_pp_filtered = df_primary_person.filter(((df_primary_person.DRVR_LIC_TYPE_ID == 'COMMERCIAL DRIVER LIC.') | \
+                                             (df_primary_person.DRVR_LIC_TYPE_ID == 'DRIVER LICENSE')) \
+                                              & (df_primary_person.PRSN_TYPE_ID.ilike('DRIVER%')))
+
+    df_charges_filtered = df_charges.filter(df_charges.CHARGE.ilike('%SPEED%'))
+
+    df_temp = df_pp_filtered.join(df_charges_filtered, ["CRASH_ID", "UNIT_NBR", "PRSN_NBR"], "inner")
+
+    df_temp_2 = df_units.join(df_temp, ["CRASH_ID", "UNIT_NBR"], "inner")
+
+    df_intermediate = df_temp_2.join(top_10_color, ["VEH_COLOR_ID"], "inner")
+
+    df_final = df_intermediate.join(top_25_state, ["VEH_LIC_STATE_ID"], "inner")
+
+    df_result = df_final.groupBy("VEH_MAKE_ID").count().\
+                orderBy("count", ascending = False).limit(5)
+
+    return df_result
+
+
+
