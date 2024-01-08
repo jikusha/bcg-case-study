@@ -44,6 +44,10 @@ analysis_config = {
     },
     Analysis.Analysis_10.value: {
         'source_data': [InputData.Units.value, InputData.Charges.value, InputData.Primary_Person.value]
+    },
+    Analysis.ALL.value: {
+        'source_data': [InputData.Units.value, InputData.Charges.value,\
+                        InputData.Primary_Person.value,  InputData.Damages.value]
     }
 }
 

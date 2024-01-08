@@ -1,13 +1,14 @@
-from base_batch_job import BaseBatchJob
-from project_utils import Analysis
-from source_config import get_source_config
+from project_utils import Analysis, cache_required_list
 from transform_methods import *
+from spark_client import load_data_into_output
 
 
-class CommonBatchJob(BaseBatchJob):
+class CommonBatchJob:
     def __init__(self, spark_client, resolved_args: dict):
-        super().__init__(spark_client, resolved_args)
-        self.analysis_number = self.resolved_args.get("analysis_number", None).lower()
+        self.resolved_args = resolved_args
+        self.spark_client = spark_client
+        self.result_dict = None
+        self.analysis_number = self.resolved_args.get("analysis_number", None).lower().strip()
         self.analysis_config = self.resolved_args.get("analysis_config", None)
         self.input_path = self.resolved_args.get("input_path", "input_data")
         self.output_path = self.resolved_args.get("output_path", "output")
@@ -28,6 +29,12 @@ class CommonBatchJob(BaseBatchJob):
                 # I have seen that few tables have some duplicate records, to remove that it is added
                 if file in [InputData.Units.value]:
                     df = df.dropDuplicates(["CRASH_ID", "UNIT_NBR"])
+
+                # when executing all analysis at once
+                # few df s are cached, as they are used multiple times later
+                if self.analysis_number == 'all' and file in cache_required_list:
+                    print("Caching started ==>")
+                    df.cache()
 
                 df.createOrReplaceTempView(file)
         else:
@@ -56,28 +63,17 @@ class CommonBatchJob(BaseBatchJob):
             result = transformation_for_analysis_9(self.spark_client, self.analysis_config)
         elif self.analysis_number == Analysis.Analysis_10.value:
             result = transformation_for_analysis_10(self.spark_client, self.analysis_config)
+        elif self.analysis_number == Analysis.ALL.value:
+            result = transformation_for_all_analysis(self.spark_client, self.analysis_config)
         else:
             print("Invalid Analysis Number!!!")
 
-        if type(result) == int:
-            self.result_str = f"Required final count for this analysis is: {result}"
-        else:
-            self.df_result = result
+        self.result_dict = result
 
     def load(self):
         print("Loading [STARTED]")
 
-        if self.result_str:
-            print(f"Loading the result as text file into the given output path: {self.output_path}")
-            text_file = open(f"{self.output_path}/{self.analysis_number}.txt", "w")
-            n = text_file.write(self.result_str)
-            text_file.close()
-            print(f"Loading the result as text file into the given output path: {self.output_path} is [COMPLETED]")
-
-        elif self.df_result:
-            print(f"Saving the final dataframe as csv file into the given output path: {self.output_path}")
-
-            self.df_result.coalesce(1).write.format('csv').mode('overwrite') \
-            .option("header", "true").save(f"{self.output_path}/{self.analysis_number}/")
-
-            print(f"Saving the final dataframe as csv file into the given output path: {self.output_path} is [COMPLETED]")
+        if self.result_dict:
+            load_data_into_output(self.result_dict, self.output_path)
+        else:
+            print("No output generated to load !!!!!!")

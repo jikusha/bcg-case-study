@@ -11,6 +11,7 @@ class Analysis(Enum):
     Analysis_8 = 'analysis_8'
     Analysis_9 = 'analysis_9'
     Analysis_10 = 'analysis_10'
+    ALL = 'all'
 
 
 class InputData(Enum):
@@ -20,3 +21,6 @@ class InputData(Enum):
     Primary_Person = 'Primary_Person_use'
     Restrict = 'Restrict_use'
     Units = 'Units_use'
+
+
+cache_required_list = [InputData.Primary_Person.value, InputData.Units.value]

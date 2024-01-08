@@ -1,3 +1,4 @@
+from pyspark.sql import DataFrame
 from pyspark.sql.session import SparkSession
 
 class SparkClient:
@@ -40,3 +41,28 @@ class SparkClient:
     def read_spark_table(self, table_name: str):
         df = self.spark.read.table(table_name)
         return df
+
+def load_data_into_output(result_dict: dict, output_path: str):
+    for k,v in result_dict.items():
+        output_path_final = f"{output_path}/{k}"
+        if type(v) == int:
+            result_str = f"Required final count for this analysis is: {v}"
+            write_text_file(result_str, f"{output_path_final}.txt")
+        else:
+            load_df_as_csv(v, f"{output_path_final}/")
+
+def write_text_file(result_str: str, output_path: str):
+    print(f"Loading the result as text file into the given output path: {output_path}")
+    text_file = open(output_path, "w")
+    n = text_file.write(result_str)
+    text_file.close()
+    print(f"Loading the result as text file into the given output path: {output_path} is [COMPLETED]")
+
+def load_df_as_csv(df: DataFrame, output_path: str):
+    print(f"Saving the final dataframe as csv file into the given output path: {output_path}")
+
+    df.coalesce(1).write.format('csv').mode('overwrite') \
+    .option("header", "true").save(output_path)
+
+    print(f"Saving the final dataframe as csv file into the given output path: {output_path} is [COMPLETED]")
+
