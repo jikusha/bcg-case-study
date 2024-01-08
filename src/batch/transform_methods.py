@@ -1,5 +1,5 @@
 from project_utils import InputData
-from pyspark.sql.functions import col, row_number
+from pyspark.sql.functions import col, row_number, split
 from pyspark.sql.window import Window
 
 def transformation_for_analysis_1(spark_client, analysis_config):
@@ -97,3 +97,29 @@ def transformation_for_analysis_8(spark_client, analysis_config):
     df_joined = df_units_filtered.join(df_primary_person_filtered, ["CRASH_ID", "UNIT_NBR"], "inner")
     df_final = df_joined.filter(df_joined.DRVR_ZIP.isNotNull()).groupby("DRVR_ZIP").count().orderBy("count", ascending=False).limit(5)
     return df_final
+
+def transformation_for_analysis_9(spark_client, analysis_config):
+    print("Transformation Started for Analysis 9 =>")
+
+    df_units = spark_client.read_spark_table(InputData.Units.value)
+    df_damages = spark_client.read_spark_table(InputData.Damages.value)
+
+    df_units_filtered_1 = df_units.\
+                        filter(df_units.VEH_DMAG_SCL_1_ID.like('DAMAGED%')).\
+                        withColumn("damage_1", split("VEH_DMAG_SCL_1_ID", ' ').getItem(1)).\
+                        filter("damage_1 > 4").select("crash_id", "unit_nbr", "fin_resp_type_id")
+
+    df_units_filtered_2 = df_units. \
+        filter(df_units.VEH_DMAG_SCL_2_ID.like('DAMAGED%')). \
+        withColumn("damage_2", split("VEH_DMAG_SCL_2_ID", ' ').getItem(1)). \
+        filter("damage_2 > 4").select("crash_id", "unit_nbr", "fin_resp_type_id")
+
+    df_units_filtered = df_units_filtered_1.union(df_units_filtered_2).\
+                        distinct().\
+                        filter("fin_resp_type_id like '%INSURANCE%'")
+
+    df_units_crash_id_distinct = df_units_filtered.select("crash_id").distinct()
+    df_damages_crash_id_distinct = df_damages.select("crash_id").distinct()
+
+    df_final = df_units_crash_id_distinct.join(df_damages_crash_id_distinct, ["crash_id"], "leftanti")
+    return df_final.count()

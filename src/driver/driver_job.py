@@ -24,7 +24,6 @@ class DriverJob:
             spark_client = SparkClient()
             analysis_config = get_analysis_config(self.analysis_number)
             self.resolved_args['analysis_config'] = analysis_config
-            print(analysis_config)
             batch_job = common_batch_job.CommonBatchJob(spark_client, resolved_args)
             batch_job.execute_job()
         except Exception as ex:
