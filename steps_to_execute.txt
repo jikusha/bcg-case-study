@@ -9,65 +9,50 @@ Steps to execute the application to get the results of the given 10 analysis:
         spark-submit needs to be executed.
         Execute the below command in the main folder (i.e. bcg-case-study)
 
-    spark-submit \
-    --py-files \
-    src/utils/spark_client.py,\
-    src/utils/project_utils.py,\
-    src/config/analysis_config.py,\
-    src/batch/common_batch_job.py,\
-    src/batch/transform_methods.py \
-    src/driver/driver_job.py \
-    analysis_number=<analysis_number>  \
-    input_path=<path> \
-    output_path=<path>
+spark-submit \
+--py-files \
+src/utils/spark_client.py,\
+src/utils/project_utils.py,\
+src/config/analysis_config.py,\
+src/batch/common_batch_job.py,\
+src/batch/transform_methods.py \
+src/driver/driver_job.py \
+analysis_number=all \
+input_path=/Users/jikusandilya/Desktop/Python/bcg-case-study/input_data \
+output_path=/Users/jikusandilya/Desktop/Python/bcg-case-study/output
 
     Need to pass command line argument, the analysis_number as all and input_path and output_path can be specified if you want a custom location.
     By default, it will use the path of input_data path and output path present in the project directory.
-
-    Like this:
-
-   spark-submit \
-   --py-files \
-   src/utils/spark_client.py,\
-   src/utils/project_utils.py,\
-   src/config/analysis_config.py,\
-   src/batch/common_batch_job.py,\
-   src/batch/transform_methods.py \
-   src/driver/driver_job.py \
-   analysis_number=all \
-   input_path=/Users/jikusandilya/Desktop/Python/bcg-case-study/input_data \
-   output_path=/Users/jikusandilya/Desktop/Python/bcg-case-study/output
-
 
    b. One analysis at one time and save the result.
       For that, replace analysis_number as analysis_1 or analysis_2 or .... or analysis_10.
 
    Like this:
 
-    spark-submit \
-    --py-files \
-    src/utils/spark_client.py,\
-    src/utils/project_utils.py,\
-    src/config/analysis_config.py,\
-    src/batch/common_batch_job.py,\
-    src/batch/transform_methods.py \
-    src/driver/driver_job.py \
-    analysis_number=analysis_1 \
-    input_path=/Users/jikusandilya/Desktop/Python/bcg-case-study/input_data \
-    output_path=/Users/jikusandilya/Desktop/Python/bcg-case-study/output
+spark-submit \
+--py-files \
+src/utils/spark_client.py,\
+src/utils/project_utils.py,\
+src/config/analysis_config.py,\
+src/batch/common_batch_job.py,\
+src/batch/transform_methods.py \
+src/driver/driver_job.py \
+analysis_number=analysis_1 \
+input_path=/Users/jikusandilya/Desktop/Python/bcg-case-study/input_data \
+output_path=/Users/jikusandilya/Desktop/Python/bcg-case-study/output
 
 
-    spark-submit \
-    --py-files \
-    src/utils/spark_client.py,\
-    src/utils/project_utils.py,\
-    src/config/analysis_config.py,\
-    src/batch/common_batch_job.py,\
-    src/batch/transform_methods.py \
-    src/driver/driver_job.py \
-    analysis_number=analysis_10 \
-    input_path=/Users/jikusandilya/Desktop/Python/bcg-case-study/input_data \
-    output_path=/Users/jikusandilya/Desktop/Python/bcg-case-study/output
+spark-submit \
+--py-files \
+src/utils/spark_client.py,\
+src/utils/project_utils.py,\
+src/config/analysis_config.py,\
+src/batch/common_batch_job.py,\
+src/batch/transform_methods.py \
+src/driver/driver_job.py \
+analysis_number=analysis_10 \
+input_path=/Users/jikusandilya/Desktop/Python/bcg-case-study/input_data \
+output_path=/Users/jikusandilya/Desktop/Python/bcg-case-study/output
 
     Again, input_path and output_path are optional. By default, it will use the path of input_data path and output path present in the project directory.
 
